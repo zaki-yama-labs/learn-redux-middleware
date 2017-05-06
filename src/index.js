@@ -7,10 +7,12 @@ const store = createStore(todoApp);
 // Log the initial state
 console.log(store.getState());
 
-function dispatchAndLog(store, action) {
+let next = store.dispatch;
+store.dispatch = function dispatchAndLog(action) {
   console.log('dispatching', action);
-  store.dispatch(action);
+  let result = next(action);
   console.log('next state', store.getState());
+  return result;
 }
 
-dispatchAndLog(store, addTodo('Use Redux'));
+store.dispatch(addTodo('Use Redux'));

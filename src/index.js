@@ -1,15 +1,14 @@
-import React from 'react';
-import { render } from 'react-dom';
-import { Provider } from 'react-redux';
 import { createStore } from 'redux';
+import { addTodo } from './actions';
 import todoApp from './reducers';
-import App from './containers/App';
 
 const store = createStore(todoApp);
 
-render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root'),
-);
+// Log the initial state
+console.log(store.getState());
+
+let action = addTodo('Use Redux');
+
+console.log('dispatching', action);
+store.dispatch(action);
+console.log('next state', store.getState());

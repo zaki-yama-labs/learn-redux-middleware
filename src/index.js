@@ -7,14 +7,27 @@ const store = createStore(todoApp);
 // Log the initial state
 console.log(store.getState());
 
-function patchStoreToAddLogging(store) {
+function logger(store) {
   let next = store.dispatch;
-  store.dispatch = function dispatchAndLog(action) {
+
+  // Previously:
+  // store.dispatch = function dispatchAndLog(action) {
+
+  return function dispatchAndLog(action) {
     console.log('dispatching', action);
     let result = next(action);
     console.log('next state', store.getState());
     return result;
   }
+}
+
+function applyMiddlewareByMonkeypatching(store, middlewares) {
+  middlewares = middlewares.slice();
+  middlewares.reverse();
+
+  middlewares.forEach(middleware => {
+    store.dispatch = middleware(store);
+  });
 }
 
 // Dummy
@@ -25,9 +38,10 @@ const Raven = {
   },
 };
 
-function patchStoreToAddCrashReporting(store) {
+function crashReporter(store) {
   let next = store.dispatch;
-  store.dispatch = function dispatchAndReportErrors(action) {
+
+  return function dispatchAndReportErrors(action) {
     try {
       return next(action);
     } catch (err) {
@@ -43,7 +57,6 @@ function patchStoreToAddCrashReporting(store) {
   }
 }
 
-patchStoreToAddLogging(store);
-patchStoreToAddCrashReporting(store);
+applyMiddlewareByMonkeypatching(store, [logger, crashReporter]);
 
 store.dispatch(addTodo('Use Redux'));

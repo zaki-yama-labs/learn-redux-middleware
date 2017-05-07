@@ -1,11 +1,6 @@
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { addTodo } from './actions';
 import todoApp from './reducers';
-
-const store = createStore(todoApp);
-
-// Log the initial state
-console.log(store.getState());
 
 /*
 function logger(store) {
@@ -50,6 +45,7 @@ const crashReporter = store => next => action => {
   }
 }
 
+/*
 function applyMiddleware(store, middlewares) {
   middlewares = middlewares.slice();
   middlewares.reverse();
@@ -61,7 +57,13 @@ function applyMiddleware(store, middlewares) {
 
   return Object.assign({}, store, { dispatch });
 }
+*/
 
-const storeWithMiddlewares = applyMiddleware(store, [logger, crashReporter]);
+// const storeWithMiddlewares = applyMiddleware(store, [logger, crashReporter]);
 
-storeWithMiddlewares.dispatch(addTodo('Use Redux'));
+const store = createStore(
+  todoApp,
+  applyMiddleware(logger, crashReporter),
+);
+
+store.dispatch(addTodo('Use Redux'));

@@ -27,15 +27,6 @@ const logger = store => next => action => {
   return result;
 }
 
-function applyMiddlewareByMonkeypatching(store, middlewares) {
-  middlewares = middlewares.slice();
-  middlewares.reverse();
-
-  middlewares.forEach(middleware => {
-    store.dispatch = middleware(store)(store.dispatch);
-  });
-}
-
 // Dummy
 const Raven = {
   captureException: function(err, optional) {
@@ -59,6 +50,18 @@ const crashReporter = store => next => action => {
   }
 }
 
-applyMiddlewareByMonkeypatching(store, [logger, crashReporter]);
+function applyMiddleware(store, middlewares) {
+  middlewares = middlewares.slice();
+  middlewares.reverse();
 
-store.dispatch(addTodo('Use Redux'));
+  let dispatch = store.dispatch;
+  middlewares.forEach((middleware) => {
+    dispatch = middleware(store)(dispatch);
+  });
+
+  return Object.assign({}, store, { dispatch });
+}
+
+const storeWithMiddlewares = applyMiddleware(store, [logger, crashReporter]);
+
+storeWithMiddlewares.dispatch(addTodo('Use Redux'));

@@ -7,18 +7,24 @@ const store = createStore(todoApp);
 // Log the initial state
 console.log(store.getState());
 
+/*
 function logger(store) {
-  let next = store.dispatch;
-
-  // Previously:
-  // store.dispatch = function dispatchAndLog(action) {
-
-  return function dispatchAndLog(action) {
-    console.log('dispatching', action);
-    let result = next(action);
-    console.log('next state', store.getState());
-    return result;
+  return function wrapDispatchToAddLogging(next) {
+    return function dispatchAndLog(action) {
+      console.log('dispatching', action);
+      let result = next(action);
+      console.log('next state', store.getState());
+      return result;
+    }
   }
+}
+*/
+
+const logger = store => next => action => {
+  console.log('dispatching', action);
+  let result = next(action);
+  console.log('next state', store.getState());
+  return result;
 }
 
 function applyMiddlewareByMonkeypatching(store, middlewares) {
@@ -26,7 +32,7 @@ function applyMiddlewareByMonkeypatching(store, middlewares) {
   middlewares.reverse();
 
   middlewares.forEach(middleware => {
-    store.dispatch = middleware(store);
+    store.dispatch = middleware(store)(store.dispatch);
   });
 }
 
@@ -38,22 +44,18 @@ const Raven = {
   },
 };
 
-function crashReporter(store) {
-  let next = store.dispatch;
-
-  return function dispatchAndReportErrors(action) {
-    try {
-      return next(action);
-    } catch (err) {
-      console.error('Caught an exception!', err);
-      Raven.captureException(err, {
-        extra: {
-          action,
-          state: store.getState(),
-        },
-      });
-      throw err;
-    }
+const crashReporter = store => next => action => {
+  try {
+    return next(action);
+  } catch (err) {
+    console.error('Caught an exception!', err);
+    Raven.captureException(err, {
+      extra: {
+        action,
+        state: store.getState(),
+      },
+    });
+    throw err;
   }
 }
 

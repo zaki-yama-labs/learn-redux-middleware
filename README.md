@@ -1,15 +1,8 @@
-Todo app with React & Redux
----------------------------
+Learn Redux Middleware
+======================
 
-A simple Todo app with React and Redux.
+[Middleware · Redux](http://redux.js.org/docs/advanced/Middleware.html)
 
-I've using the following technologies:
-
-* React
-* Redux
-* webpack
-* Babel for ES2015
-* ESLint
 
 ### Usage
 

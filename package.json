@@ -1,7 +1,6 @@
 {
-  "name": "redux-todo-app",
+  "name": "learn-redux-middleware",
   "version": "1.0.0",
-  "description": "Simple Redux Todo App",
   "main": "index.js",
   "scripts": {
     "webpack": "webpack --progress --colors --watch",
